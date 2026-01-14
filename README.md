@@ -32,7 +32,7 @@ The script relies on standard Arch ISO tools:
 Run the following command in your Arch ISO terminal (requires internet):
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/collinscoder1/arch_omarchy_dualboot_setup/main/arch_omarchy_dualboot_setup.sh)
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/collinscoder1/arch_omarchy_dualboot_setup/main/arch_omarchy_dualboot_setup.sh)"
 ```
 
 ### Manual Method
