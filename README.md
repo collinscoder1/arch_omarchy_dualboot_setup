@@ -28,6 +28,14 @@ The script relies on standard Arch ISO tools:
 
 ## Usage
 
+### ⚡ Quick Start (One-Liner)
+Run the following command in your Arch ISO terminal (requires internet):
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/collinscoder1/arch_omarchy_dualboot_setup/main/arch_omarchy_dualboot_setup.sh)
+```
+
+### Manual Method
 1. **Boot into Arch ISO**.
 2. **Download or Clone** this script.
 3. Make it executable:
