@@ -19,15 +19,7 @@ TMP_MOUNT="/mnt/__tmp"
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "📘 Logging to: $LOG_FILE"
 
-if [[ $EUID -ne 0 ]]; then
-    echo "⚠️  This script requires root privileges."
-    echo "🔑 Tentative elevation... (sudo)"
-    if ! sudo -v; then
-       echo "❌ Sudo authentication failed. Please run as root."
-       exit 1
-    fi
-    exec sudo "$0" "$@"
-fi
+[[ $EUID -eq 0 ]] || { echo "❌ Please run as root (sudo)."; exit 1; }
 
 # Check dependencies
 for cmd in whiptail parted lsblk cryptsetup mkfs.btrfs; do
@@ -145,14 +137,16 @@ select_disk() {
     fi
 
     # Build menu options
+    whiptail --title "Scanning" --infobox "Scanning for disks..." 5 40
+    
     local -a OPTIONS=()
-    while IFS= read -r line; do
-        eval "$line"
-        [[ "${TYPE:-}" == "disk" ]] || continue
-        # Create a readable label: "Model - Size"
-        local LABEL="${MODEL:-Unknown} - ${SIZE:-?}"
+    # Use -d for disks only, -n for no header, -o for specific columns
+    # We read line by line.
+    while read -r NAME SIZE MODEL; do
+        # Create a readable label: "Model (Size)"
+        local LABEL="${MODEL:-Unknown} ($SIZE)"
         OPTIONS+=("/dev/$NAME" "$LABEL")
-    done < <(lsblk -P -o NAME,TYPE,SIZE,MODEL,TRAN)
+    done < <(lsblk -d -n -o NAME,SIZE,MODEL | grep -v "loop" | grep -v "sr0")
 
     if [[ ${#OPTIONS[@]} -eq 0 ]]; then
         whiptail --title "Error" --msgbox "No disks found!" 10 40
