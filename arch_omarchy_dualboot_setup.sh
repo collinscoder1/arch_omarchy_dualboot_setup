@@ -19,7 +19,15 @@ TMP_MOUNT="/mnt/__tmp"
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "📘 Logging to: $LOG_FILE"
 
-[[ $EUID -eq 0 ]] || { echo "Run as root."; exit 1; }
+if [[ $EUID -ne 0 ]]; then
+    echo "⚠️  This script requires root privileges."
+    echo "🔑 Tentative elevation... (sudo)"
+    if ! sudo -v; then
+       echo "❌ Sudo authentication failed. Please run as root."
+       exit 1
+    fi
+    exec sudo "$0" "$@"
+fi
 
 # Check dependencies
 for cmd in whiptail parted lsblk cryptsetup mkfs.btrfs; do
